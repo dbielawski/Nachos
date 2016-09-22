@@ -76,6 +76,7 @@ WriteDoneHandler (void *arg)
 //      the output.  Stop when the user types a 'q'.
 //----------------------------------------------------------------------
 
+#ifdef CHANGED
 void
 ConsoleTest (const char *in, const char *out)
 {
@@ -85,18 +86,36 @@ ConsoleTest (const char *in, const char *out)
     writeDone = new Semaphore ("write done", 0);
     console = new Console (in, out, ReadAvailHandler, WriteDoneHandler, 0);
 
+
     for (;;)
-      {
-	  readAvail->P ();	// wait for character to arrive
-	  ch = console->GetChar ();
-	  console->PutChar (ch);	// echo it!
-	  writeDone->P ();	// wait for write to finish
-	  if (ch == 'q') {
-	      printf ("Nothing more, bye!\n");
-	      break;		// if q, quit
-	  }
-      }
+    {
+        readAvail->P ();	// wait for character to arrive
+        ch = console->GetChar ();
+
+        if (ch != '\n')
+        {
+            console->PutChar ('<');  // echo it!
+            writeDone->P ();  // wait for write to finish  
+        }
+
+        console->PutChar (ch);	// echo it!
+        writeDone->P ();	// wait for write to finish
+
+        if (ch != '\n')
+        {
+            console->PutChar ('>');  // echo it!
+            writeDone->P ();  // wait for write to finish  
+        }
+
+        if (ch == 'q') {
+            printf ("Nothing more, bye!\n");
+            break;      // if q, quit
+        }
+    }
+    
+    printf("Au revoir\n");
     delete console;
     delete readAvail;
     delete writeDone;
 }
+#endif // CHANGED
