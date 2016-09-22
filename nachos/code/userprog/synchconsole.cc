@@ -16,7 +16,7 @@ SynchConsole::SynchConsole(const char *in, const char *out)
 {
 	readAvail = new Semaphore("read avail", 0);
 	writeDone = new Semaphore("write done", 0);
-	console = new Concole(in, out, ReadAvailHandler, WriteDoneHandler);
+	console = new Console(in, out, ReadAvailHandler, WriteDoneHandler, NULL);
 }
 
 SynchConsole::~SynchConsole()
@@ -28,7 +28,7 @@ SynchConsole::~SynchConsole()
 
 void SynchConsole::SynchPutChar(int ch)
 {
-	console->SynchPutChar(ch);
+	console->PutChar(ch);
 	writeDone->P();
 }
 
@@ -36,6 +36,7 @@ int SynchConsole::SynchGetChar()
 {
 	readAvail->P();
 	char c = console->GetChar();
+	return c;
 }
 
 void SynchConsole::SynchPutString(const char s[])

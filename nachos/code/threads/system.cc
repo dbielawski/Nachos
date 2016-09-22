@@ -12,6 +12,7 @@
 #include <malloc.h>
 #endif
 
+
 // This defines *all* of the global data structures used by Nachos.
 // These are all initialized and de-allocated by this file.
 
@@ -38,6 +39,12 @@ Machine *machine;		// user program memory and registers
 #ifdef NETWORK
 PostOffice *postOffice;
 #endif
+
+#ifdef CHANGED
+#ifdef USER_PROGRAM
+SynchConsole *synchconsole;
+#endif // end USER_PROGRAM
+#endif // end CHANGED
 
 
 // External definition, to allow us to take a pointer to this function
@@ -206,12 +213,19 @@ Cleanup ()
     scheduler->Halt();
     interrupt->Enable();
 
+
 #ifdef NETWORK
     delete postOffice;
     postOffice = NULL;
 #endif
 
+
+
 #ifdef USER_PROGRAM
+#ifdef CHANGED
+    delete synchconsole;
+    synchconsole = NULL;
+#endif
     delete machine;
     machine = NULL;
 #endif

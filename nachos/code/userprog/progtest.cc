@@ -14,6 +14,10 @@
 #include "addrspace.h"
 #include "synch.h"
 
+#ifdef CHANGED
+#include <synchconsole.h>
+#endif // end CHANGED
+
 //----------------------------------------------------------------------
 // StartProcess
 //      Run a user program.  Open the executable, load it into
@@ -92,30 +96,62 @@ ConsoleTest (const char *in, const char *out)
         readAvail->P ();	// wait for character to arrive
         ch = console->GetChar ();
 
-        if (ch != '\n')
+        if (ch == EOF)
         {
-            console->PutChar ('<');  // echo it!
-            writeDone->P ();  // wait for write to finish  
+            printf("Au revoir\n");
+            break;    
         }
-
-        console->PutChar (ch);	// echo it!
-        writeDone->P ();	// wait for write to finish
-
-        if (ch != '\n')
+        else
         {
-            console->PutChar ('>');  // echo it!
-            writeDone->P ();  // wait for write to finish  
-        }
+            if (ch != '\n')
+            {
+                console->PutChar ('<');  // echo it!
+                writeDone->P ();  // wait for write to finish  
+            }
 
-        if (ch == 'q') {
-            printf ("Nothing more, bye!\n");
-            break;      // if q, quit
+            console->PutChar (ch);  // echo it!
+            writeDone->P ();    // wait for write to finish
+
+            if (ch != '\n')
+            {
+                console->PutChar ('>');  // echo it!
+                writeDone->P ();  // wait for write to finish  
+            }
+            if (ch == 'q') {
+                printf ("Nothing more, bye!\n");
+                break;      // if q, quit
+            }
         }
     }
     
-    printf("Au revoir\n");
+    
     delete console;
     delete readAvail;
     delete writeDone;
 }
+
+void SynchConsoleTest (const char *in, const char *out)
+{
+    char ch;
+    SynchConsole *test_synchconsole = new SynchConsole(in, out);
+
+    while ((ch = test_synchconsole->SynchGetChar()) != EOF)
+    {
+        if (ch != '\n')
+            test_synchconsole->SynchPutChar('<');
+
+        test_synchconsole->SynchPutChar(ch);
+
+        if (ch != '\n')
+            test_synchconsole->SynchPutChar('>');
+
+        if (ch == 'q')
+            break;
+    }
+
+    fprintf(stderr, "EOF detected in SynchConsole!\n");
+
+    delete test_synchconsole;
+}
+
 #endif // CHANGED
