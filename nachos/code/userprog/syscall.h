@@ -137,7 +137,7 @@ void Yield ();
 
 #ifdef CHANGED
 void PutChar(char ch);
-#endif
+#endif // end CHANGED
 
 
 #endif // IN_USER_MODE
