@@ -257,13 +257,12 @@ Cleanup ()
 #ifdef USER_PROGRAM
 int copyStringFromMachine(int from, char* to, unsigned size)
 {
-    int* v = (int*)malloc(1);
-    int cpt = 0;
+    int* v = (int*)malloc(sizeof(int));
+    unsigned cpt = 0;
     *v = 1;
 
     while (*v != '\0' && cpt < size)
     {
-        // printf("adresse %i \n", from);
         machine->ReadMem(from, sizeof(char), v);
         to[cpt] = *v;
         from++;

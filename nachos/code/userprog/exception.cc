@@ -86,35 +86,50 @@ ExceptionHandler (ExceptionType which)
 		    break;
 		  }
 #ifdef CHANGED
+		  case SC_Exit:
+		  {
+		  	DEBUG ('s', "Exit, initiated by user program.\n");
+		  	int code = machine->ReadRegister(4);
+		  	Exit(code);
+		  	break;
+		  }
+
 		  case SC_PutChar:
 		  {
-		    DEBUG ('s', "PutChar.\n");
+		    DEBUG ('s', "PutChar, initiated by user program.\n");
 		    int c = machine->ReadRegister (4);
 		    synchconsole->SynchPutChar(c);
 		    break;
 		  }
 		  case SC_PutString:
 		  {
-		    DEBUG ('s', "PutString.\n");
+		    DEBUG ('s', "PutString, initiated by user program.\n");
 
-		    char* buffer = (char*)malloc(MAX_STRING_SIZE);
+		    char* buffer = (char*)malloc(MAX_STRING_SIZE * sizeof(char));
 
 		    if (!buffer)
 		    	ASSERT(FALSE);
 
 		    int c = machine->ReadRegister (4);
-		    int nbCharCopie = MAX_STRING_SIZE;
-
-
+		    int nbCharCopie = 0;
 		    int i = 0;
-		    // faire un do while ?!
-		    while (nbCharCopie == MAX_STRING_SIZE)
+
+		    do
 		    {
-			    nbCharCopie = copyStringFromMachine(i * MAX_STRING_SIZE + c, buffer, (unsigned)MAX_STRING_SIZE);
+			    nbCharCopie = copyStringFromMachine(i * MAX_STRING_SIZE + c, buffer, MAX_STRING_SIZE);
 			    synchconsole->SynchPutString(buffer);	
 			    ++i;	    	
-		    }
+		    } while (nbCharCopie == MAX_STRING_SIZE);
+
 		    free(buffer);
+		    break;
+		  }
+		  case SC_GetChar:
+		  {
+		    DEBUG ('s', "GetChar, initiated by user program.\n");
+		    int c = synchconsole->SynchGetChar();
+		    machine->WriteRegister(2, c);		    
+
 		    break;
 		  }
 #endif // end CHANGED
