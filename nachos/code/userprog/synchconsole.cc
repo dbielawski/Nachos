@@ -52,13 +52,23 @@ void SynchConsole::SynchPutString(const char s[])
 
 void SynchConsole::SynchGetString(char *s, int n)
 {
-	char* string = (char*)malloc(sizeof(char) * (n + 1));
+	char c;
+	int i = 0;
 
-	for (int i = 0; i < n; ++i)
+	while (i < n - 1)
 	{
-		string[i] = SynchGetChar();
+		c = SynchGetChar();
+
+		if (c == EOF || c == '\n')
+		{
+			break;
+		}
+		else
+			s[i] = c;
+		++i;
 	}
-	string[n] = '\0';
+
+	s[i] = '\0';
 }
 
 #endif // CHANGED

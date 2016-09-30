@@ -251,30 +251,3 @@ Cleanup ()
 
     Exit (0);
 }
-
-
-#ifdef CHANGED
-#ifdef USER_PROGRAM
-int copyStringFromMachine(int from, char* to, unsigned size)
-{
-    int* v = (int*)malloc(sizeof(int));
-    unsigned cpt = 0;
-    *v = 1;
-
-    while (*v != '\0' && cpt < size)
-    {
-        machine->ReadMem(from, sizeof(char), v);
-        to[cpt] = *v;
-        from++;
-        cpt++;        
-    }
-
-    if (cpt < size - 1)
-        to[cpt] = '\0';
-
-    free(v);
-
-    return cpt;
-}
-#endif
-#endif // end CHAGNED

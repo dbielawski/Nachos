@@ -110,7 +110,9 @@ ExceptionHandler (ExceptionType which)
 		    if (!buffer)
 		    	ASSERT(FALSE);
 
+			// On recupere l'adresse sur le premier caractere
 		    int c = machine->ReadRegister (4);
+
 		    int nbCharCopie = 0;
 		    int i = 0;
 
@@ -128,8 +130,28 @@ ExceptionHandler (ExceptionType which)
 		  {
 		    DEBUG ('s', "GetChar, initiated by user program.\n");
 		    int c = synchconsole->SynchGetChar();
-		    machine->WriteRegister(2, c);		    
+		    machine->WriteRegister(2, c);
+		    break;
+		  }
+		  case SC_GetString:
+		  {
+		    DEBUG ('s', "GetString, initiated by user program.\n");
 
+		    /* On recupere les parametres dans les registres */
+		    // On recupere l'adresse sur le premier caractere
+		    int s = machine->ReadRegister(4);
+		    // On recupere la taille
+		    int taille = machine->ReadRegister(5);
+
+		    char* buffer = (char*)malloc(sizeof(char) * MAX_STRING_SIZE);
+
+		    if (!buffer)
+		    	ASSERT(FALSE);
+
+		    synchconsole->SynchGetString(buffer, taille);
+		    int nbCharCopie = copyStringToMachine(buffer, s, taille);
+
+		    free(buffer);
 		    break;
 		  }
 #endif // end CHANGED
@@ -160,3 +182,45 @@ ExceptionHandler (ExceptionType which)
 	  ASSERT (FALSE);
       }
 }
+
+#ifdef CHANGED
+int copyStringFromMachine(int from, char* to, unsigned size)
+{
+    int* v = (int*)malloc(sizeof(int));
+    unsigned i = 0;
+    *v = 1;
+
+    while (*v != '\0' && i < size)
+    {
+        machine->ReadMem(from, sizeof(char), v);
+        to[i] = *v;
+        from++;
+        ++i;        
+    }
+
+    if (i < size && *v != '\0')
+    	to[i] = '\0';
+
+    free(v);
+
+    return i;
+}
+
+int copyStringToMachine(char* s, int to, unsigned size)
+{
+	unsigned i = 0;
+	const char* string = s;
+
+	while (*string && i < size)
+	{
+		machine->WriteMem(to, sizeof(char), *string);
+		string++;
+		to++;
+		++i;
+	}
+
+	machine->WriteMem(to, sizeof(char), '\n');
+
+	return i;
+}
+#endif // end CHAGNED
