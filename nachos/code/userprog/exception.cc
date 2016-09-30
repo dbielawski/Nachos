@@ -93,7 +93,32 @@ ExceptionHandler (ExceptionType which)
 		    synchconsole->SynchPutChar(c);
 		    break;
 		  }
+		  case SC_PutString:
+		  {
+		    DEBUG ('s', "PutString.\n");
+
+		    char* buffer = (char*)malloc(MAX_STRING_SIZE);
+
+		    if (!buffer)
+		    	ASSERT(FALSE);
+
+		    int c = machine->ReadRegister (4);
+		    int nbCharCopie = MAX_STRING_SIZE;
+
+
+		    int i = 0;
+		    // faire un do while ?!
+		    while (nbCharCopie == MAX_STRING_SIZE)
+		    {
+			    nbCharCopie = copyStringFromMachine(i * MAX_STRING_SIZE + c, buffer, (unsigned)MAX_STRING_SIZE);
+			    synchconsole->SynchPutString(buffer);	
+			    ++i;	    	
+		    }
+		    free(buffer);
+		    break;
+		  }
 #endif // end CHANGED
+
 		default:
 		  {
 		    printf("Unimplemented system call %d\n", type);

@@ -41,7 +41,13 @@ int SynchConsole::SynchGetChar()
 
 void SynchConsole::SynchPutString(const char s[])
 {
+	const char* string = s;
 
+	while (*string)
+	{
+		SynchPutChar(*string);
+		string++;
+	}
 }
 
 void SynchConsole::SynchGetString(char *s, int n)
