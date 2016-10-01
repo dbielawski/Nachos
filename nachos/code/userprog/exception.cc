@@ -90,6 +90,7 @@ ExceptionHandler (ExceptionType which)
 		  {
 		  	DEBUG ('s', "Exit, initiated by user program.\n");
 		  	int code = machine->ReadRegister(4);
+		  	interrupt->Halt();
 		  	Exit(code);
 		  	break;
 		  }
