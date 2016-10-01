@@ -4,11 +4,13 @@ int main()
 {
 	
 	// const char* string = "Hello World!!!\n";
-	const char* string = "HEllo world\n";
+	const char* string = "A2";
 
+	PutString(string);
+	PutString(string);
+	PutString(string);
 	PutString(string);
 	PutString("\n");
-	PutString(string);
 
-	Halt();
+	return 0;
 }

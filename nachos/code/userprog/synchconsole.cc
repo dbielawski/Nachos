@@ -41,12 +41,12 @@ int SynchConsole::SynchGetChar()
 
 void SynchConsole::SynchPutString(const char s[])
 {
-	const char* string = s;
+    int i = 0;
 
-	while (*string)
+	while (s[i] && i < MAX_STRING_SIZE)
 	{
-		SynchPutChar(*string);
-		string++;
+		SynchPutChar(s[i]);
+		++i;
 	}
 }
 

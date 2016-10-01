@@ -97,6 +97,7 @@ ExceptionHandler (ExceptionType which)
 		  case SC_PutChar:
 		  {
 		    DEBUG ('s', "PutChar, initiated by user program.\n");
+		    // On recupere l'adresse du caractere
 		    int c = machine->ReadRegister (4);
 		    synchconsole->SynchPutChar(c);
 		    break;
@@ -104,6 +105,12 @@ ExceptionHandler (ExceptionType which)
 		  case SC_PutString:
 		  {
 		    DEBUG ('s', "PutString, initiated by user program.\n");
+
+		    if (MAX_STRING_SIZE < 2)
+		    {
+		    	printf("PutString, le taille du tampon doit etre superieure a 1 !");
+		    	ASSERT(FALSE);
+		    }
 
 		    char* buffer = (char*)malloc(MAX_STRING_SIZE * sizeof(char));
 
@@ -115,12 +122,12 @@ ExceptionHandler (ExceptionType which)
 
 		    int nbCharCopie = 0;
 		    int i = 0;
-
+		    
 		    do
 		    {
 			    nbCharCopie = copyStringFromMachine(i * MAX_STRING_SIZE + c, buffer, MAX_STRING_SIZE);
-			    synchconsole->SynchPutString(buffer);	
-			    ++i;	    	
+			    synchconsole->SynchPutString(buffer);
+			    ++i;
 		    } while (nbCharCopie == MAX_STRING_SIZE);
 
 		    free(buffer);
@@ -183,26 +190,30 @@ ExceptionHandler (ExceptionType which)
       }
 }
 
+
+
 #ifdef CHANGED
+// Copie une chaine du mode user vers un tampon dans lespace kernel.
+// from : adresse du monde user
+// to : buffer dans le mode kernel
+// size : taille du buffer du mode kernel
+// return le nombre delements reelement copie dans to
 int copyStringFromMachine(int from, char* to, unsigned size)
 {
-    int* v = (int*)malloc(sizeof(int));
+	int v;
     unsigned i = 0;
-    *v = 1;
 
-    while (*v != '\0' && i < size)
+    // Tant que nous ne sommes pas en fin de chaine et que nous n'avons pas
+    // ecris plus que la taille limite du buffer, size, faire...
+    do
     {
-        machine->ReadMem(from, sizeof(char), v);
-        to[i] = *v;
-        from++;
-        ++i;        
-    }
+    	if (machine->ReadMem(from + i, sizeof(char), &v))
+	        to[i] = v;
+        ++i;
 
-    if (i < size && *v != '\0')
-    	to[i] = '\0';
+    } while (v != '\0' && i < size);
 
-    free(v);
-
+    to[i] = '\0';
     return i;
 }
 
@@ -214,8 +225,8 @@ int copyStringToMachine(char* s, int to, unsigned size)
 	while (*string && i < size)
 	{
 		machine->WriteMem(to, sizeof(char), *string);
-		string++;
-		to++;
+		++string;
+		++to;
 		++i;
 	}
 

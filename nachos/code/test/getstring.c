@@ -7,6 +7,7 @@ int main()
 	char string[size];
 	GetString(string, size);
 	PutString(string);
-	PutString("Fin du programme\n");
+	PutString(string);
+	PutString(string);
 	return 0;
 }
