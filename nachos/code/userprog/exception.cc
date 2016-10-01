@@ -97,7 +97,6 @@ ExceptionHandler (ExceptionType which)
 		  case SC_PutChar:
 		  {
 		    DEBUG ('s', "PutChar, initiated by user program.\n");
-		    // On recupere l'adresse du caractere
 		    int c = machine->ReadRegister (4);
 		    synchconsole->SynchPutChar(c);
 		    break;
@@ -117,7 +116,6 @@ ExceptionHandler (ExceptionType which)
 		    if (!buffer)
 		    	ASSERT(FALSE);
 
-			// On recupere l'adresse sur le premier caractere
 		    int c = machine->ReadRegister (4);
 
 		    int nbCharCopie = 0;
@@ -144,10 +142,7 @@ ExceptionHandler (ExceptionType which)
 		  {
 		    DEBUG ('s', "GetString, initiated by user program.\n");
 
-		    /* On recupere les parametres dans les registres */
-		    // On recupere l'adresse sur le premier caractere
 		    int s = machine->ReadRegister(4);
-		    // On recupere la taille
 		    int taille = machine->ReadRegister(5);
 
 		    char* buffer = (char*)malloc(sizeof(char) * MAX_STRING_SIZE);
@@ -160,6 +155,25 @@ ExceptionHandler (ExceptionType which)
 
 		    free(buffer);
 		    break;
+		  }
+
+		  case SC_PutInt:
+		  {
+		  	DEBUG ('s', "PutInt, initiated by user program.\n");
+
+		  	int entier = machine->ReadRegister(4);
+		  	synchconsole->SynchPutInt(entier);
+		  	break;
+		  }
+		  case SC_GetInt:
+		  {
+		  	DEBUG ('s', "GetInt, initiated by user program.\n");
+
+		  	int n;
+		  	synchconsole->SynchGetInt(&n);
+		  	int s = machine->ReadRegister(4);
+		  	machine->WriteMem(s, sizeof(int), n);
+		  	break;
 		  }
 #endif // end CHANGED
 
@@ -217,15 +231,17 @@ int copyStringFromMachine(int from, char* to, unsigned size)
     return i;
 }
 
+// Copie une chaine du mode kernel dans un tampon du mode user
+// s: la chaine a copier
+// to: pointeur sur adresse (mode user)
+// size: taille du tampon
 int copyStringToMachine(char* s, int to, unsigned size)
 {
 	unsigned i = 0;
-	const char* string = s;
 
-	while (*string && i < size)
+	while (s[i] && i < size)
 	{
-		machine->WriteMem(to, sizeof(char), *string);
-		++string;
+		machine->WriteMem(to, sizeof(char), s[i]);
 		++to;
 		++i;
 	}
