@@ -2,6 +2,6 @@
 
 int main()
 {
-	PutInt(100);
-
+	PutInt(650000);
+	Exit(0);
 }

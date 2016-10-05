@@ -73,6 +73,12 @@ ExceptionHandler (ExceptionType which)
 {
     int type = machine->ReadRegister (2);
 
+    if (MAX_STRING_SIZE < 2)
+    {
+    	printf ("La taille du buffer doit etre superieure a 1\n");
+    	ASSERT(FALSE);
+    }
+
     switch (which)
       {
 	case SyscallException:
@@ -90,8 +96,8 @@ ExceptionHandler (ExceptionType which)
 		  {
 		  	DEBUG ('s', "Exit, initiated by user program.\n");
 		  	int code = machine->ReadRegister(4);
+	  		printf("Le programme s'est terminé avec le code de retour: %i\n", code);
 		  	interrupt->Halt();
-		  	Exit(code);
 		  	break;
 		  }
 
@@ -114,14 +120,11 @@ ExceptionHandler (ExceptionType which)
 
 		    char* buffer = (char*)malloc(MAX_STRING_SIZE * sizeof(char));
 
-		    if (!buffer)
-		    	ASSERT(FALSE);
-
 		    int c = machine->ReadRegister (4);
 
 		    int nbCharCopie = 0;
 		    int i = 0;
-		    
+
 		    do
 		    {
 			    nbCharCopie = copyStringFromMachine(i * MAX_STRING_SIZE + c, buffer, MAX_STRING_SIZE);
@@ -147,9 +150,6 @@ ExceptionHandler (ExceptionType which)
 		    int taille = machine->ReadRegister(5);
 
 		    char* buffer = (char*)malloc(sizeof(char) * MAX_STRING_SIZE);
-
-		    if (!buffer)
-		    	ASSERT(FALSE);
 
 		    synchconsole->SynchGetString(buffer, taille);
 		    int nbCharCopie = copyStringToMachine(buffer, s, taille);
@@ -209,27 +209,34 @@ ExceptionHandler (ExceptionType which)
 
 #ifdef CHANGED
 // Copie une chaine du mode user vers un tampon dans lespace kernel.
-// from : adresse du monde user
-// to : buffer dans le mode kernel
+// from : adresse de lespace user
+// to : buffer dans lespace kernel
 // size : taille du buffer du mode kernel
 // return le nombre delements reelement copie dans to
 int copyStringFromMachine(int from, char* to, unsigned size)
 {
-	int v;
-    unsigned i = 0;
+	if (!to || size < 2)
+		return 0;
 
-    // Tant que nous ne sommes pas en fin de chaine et que nous n'avons pas
-    // ecris plus que la taille limite du buffer, size, faire...
-    do
+   else
     {
-    	if (machine->ReadMem(from + i, sizeof(char), &v))
-	        to[i] = v;
-        ++i;
+		int v;
+	    unsigned i = 0;
 
-    } while (v != '\0' && i < size);
+	    // Tant que nous ne sommes pas en fin de chaine et que nous n'avons pas
+	    // ecris plus que la taille limite du buffer, size,
+	    // ecrire dans le buffer du kernel
+	    do
+	    {
+	    	if (machine->ReadMem(from + i, sizeof(char), &v))
+		        to[i] = v;
+	        ++i;
 
-    to[i] = '\0';
-    return i;
+	    } while (v != '\0' && i < size);
+
+	    to[i] = '\0';
+    	return i;
+    }
 }
 
 // Copie une chaine du mode kernel dans un tampon du mode user
@@ -238,17 +245,22 @@ int copyStringFromMachine(int from, char* to, unsigned size)
 // size: taille du tampon
 int copyStringToMachine(char* s, int to, unsigned size)
 {
-	unsigned i = 0;
+	if (!to || size < 2)
+		return 0;
 
-	while (s[i] && i < size)
+	else
 	{
-		machine->WriteMem(to, sizeof(char), s[i]);
-		++to;
-		++i;
+		unsigned i = 0;
+
+		for (i = 0; i < size && s[i]; ++i)
+		{
+			machine->WriteMem(to, sizeof(char), s[i]);
+			++to;
+		}
+
+		machine->WriteMem(to, sizeof(char), '\n');
+
+		return i;		
 	}
-
-	machine->WriteMem(to, sizeof(char), '\n');
-
-	return i;
 }
 #endif // end CHAGNED

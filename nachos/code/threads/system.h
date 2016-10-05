@@ -38,7 +38,7 @@ extern Machine *machine;	// user program memory and registers
 extern SynchConsole *synchconsole;
 extern int copyStringFromMachine(int from, char* to, unsigned size);
 extern int copyStringToMachine(char* s, int to, unsigned size);
-#define MAX_STRING_SIZE 5
+#define MAX_STRING_SIZE 3
 
 #endif	// end CHANGED
 

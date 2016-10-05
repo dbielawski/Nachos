@@ -42,30 +42,27 @@ int SynchConsole::SynchGetChar()
 {
 	readAvail->P();
 	char c = console->GetChar();
+
+	if (c == EOF)
+		c = ' ';
+
 	return c;
 }
 
 void SynchConsole::SynchPutString(const char s[])
 {
-    int i = 0;
-
-	while (s[i] && i < MAX_STRING_SIZE)
-	{
+	for (int i = 0; i < MAX_STRING_SIZE && s[i]; ++i)
 		SynchPutChar(s[i]);
-		++i;
-	}
 }
 
 void SynchConsole::SynchGetString(char *s, int n)
 {
 	semaphoreSynchGetString->P();
 
-	char c;
-	int i = 0;
-
-	while (i < n - 1)
+	int i;
+	for (i = 0; i < n - 1; ++i)
 	{
-		c = SynchGetChar();
+		char c = SynchGetChar();
 
 		if (c == EOF || c == '\n')
 		{
@@ -73,7 +70,6 @@ void SynchConsole::SynchGetString(char *s, int n)
 		}
 		else
 			s[i] = c;
-		++i;
 	}
 
 	s[i] = '\0';

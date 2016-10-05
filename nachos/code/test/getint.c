@@ -10,5 +10,5 @@ int main()
 	GetInt(&n);
 	PutInt(n);
 	PutChar('\n');
-	return 0;
+	Exit(0);
 }
