@@ -140,10 +140,20 @@ void Fork (void (*func) ());
 void Yield ();
 
 #ifdef CHANGED
+// Affiche un caractere sur la console
 void PutChar(char ch);
+// Affiche un chaine de caractere sur la console
 void PutString(const char* string);
 
+
+// Recupere un caractere et l'affiche
+int GetChar();
+// Recupere une chaine et l'affiche
+void GetString(char* s, int size);
+
+// Affiche un entier sur la console
 void PutInt(int n);
+// Recupere un entier et l'affiche
 void GetInt(int* n);
 #endif // end CHANGED
 

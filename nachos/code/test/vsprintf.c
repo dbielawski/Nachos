@@ -347,6 +347,12 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	return str-buf;
 }
 
+
+
+/*
+une meilleure implementation
+http://stackoverflow.com/questions/1056411/how-to-pass-variable-number-of-arguments-to-printf-sprintf
+*/
 int sprintf(char * buf, const char *fmt, ...)
 {
 	va_list args;

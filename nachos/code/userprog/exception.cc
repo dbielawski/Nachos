@@ -95,6 +95,7 @@ ExceptionHandler (ExceptionType which)
 		  case SC_Exit:
 		  {
 		  	DEBUG ('s', "Exit, initiated by user program.\n");
+		  	// On recupere l'aguement dans le registre 4
 		  	int code = machine->ReadRegister(4);
 	  		printf("Le programme s'est terminé avec le code de retour: %i\n", code);
 		  	interrupt->Halt();
@@ -245,19 +246,25 @@ int copyStringFromMachine(int from, char* to, unsigned size)
 // size: taille du tampon
 int copyStringToMachine(char* s, int to, unsigned size)
 {
+	// Traite les cas non valides (pointeur null, buffer trop petit)
 	if (!to || size < 2)
 		return 0;
 
 	else
 	{
+		// Compteur du nombre de caracteres copies
 		unsigned i = 0;
 
+		// Copie les caracteres dans to
 		for (i = 0; i < size && s[i]; ++i)
 		{
 			machine->WriteMem(to, sizeof(char), s[i]);
 			++to;
 		}
 
+
+		// On s'assure que to fini par un retour a la ligne
+		// pour ne pas que les caracteres tapes soient concatenes
 		machine->WriteMem(to, sizeof(char), '\n');
 
 		return i;		
