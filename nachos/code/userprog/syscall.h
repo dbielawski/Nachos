@@ -39,6 +39,9 @@
 #define SC_GetString	14
 #define SC_PutInt		15
 #define SC_GetInt		16
+
+#define SC_ThreadCreate	17
+#define SC_ThreadExit	18
 #endif // end CHANGED
 
 #ifdef IN_USER_MODE
@@ -155,6 +158,12 @@ void GetString(char* s, int size);
 void PutInt(int n);
 // Recupere un entier et l'affiche
 void GetInt(int* n);
+
+// cree un thread
+int ThreadCreate(void f(void* arg), void* arg);
+
+// finit un thread
+void ThreadExit();
 #endif // end CHANGED
 
 

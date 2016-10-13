@@ -27,6 +27,7 @@
 
 #ifdef CHANGED
 #include "synchconsole.h"
+#include "userthread.h"
 #endif // end CAHANGED
 
 //----------------------------------------------------------------------
@@ -269,5 +270,10 @@ int copyStringToMachine(char* s, int to, unsigned size)
 
 		return i;		
 	}
+}
+
+int do_CreateThread(int f, int arg)
+{
+	
 }
 #endif // end CHAGNED

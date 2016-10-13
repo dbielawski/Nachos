@@ -17,7 +17,5 @@ int main()
 	PutChar(toupper('b'));
 	PutChar('\n');
 
-	printf("fazef");
-
 	Exit(0);
 }

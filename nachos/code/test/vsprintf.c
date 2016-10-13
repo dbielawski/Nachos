@@ -366,3 +366,11 @@ int sprintf(char * buf, const char *fmt, ...)
 
 
 
+void printf(char* s, ...)
+{
+	// char dest[1024 * 16];
+ //    va_list argp;
+ //    va_start(arg, format);
+ //    vsprintf(dest, format, arg);
+ //    va_end(arg);
+}
