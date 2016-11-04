@@ -197,3 +197,15 @@ AddrSpace::RestoreState ()
     machine->pageTable = pageTable;
     machine->pageTableSize = numPages;
 }
+
+
+#ifdef CHANGED
+// Retourne l adresse du haute de la pile
+// 1er version simpliste qui marche pour un thread
+int AddrSpace::AllocateUserStack()
+{
+    int size = numPages * PageSize;
+
+    return size - 256;
+}
+#endif // CHANGED

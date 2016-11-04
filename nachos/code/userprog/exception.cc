@@ -178,6 +178,23 @@ ExceptionHandler (ExceptionType which)
 		  	machine->WriteMem(s, sizeof(int), n);
 		  	break;
 		  }
+
+		  case SC_ThreadCreate:
+		  {
+		  	DEBUG ('s', "ThreadCreate, initiated by user program.\n");
+
+		  	int f = machine->ReadRegister(4);
+		  	int arg = machine->ReadRegister(5);
+		  	do_CreateThread(f, arg);
+		  	break;
+		  }
+		  case SC_ThreadExit:
+		  {
+		  	DEBUG ('s', "ThreadExit, initiated by user program.\n");
+
+		  	do_ThreadExit();
+		  	break;
+		  }
 #endif // end CHANGED
 
 		default:
@@ -272,8 +289,4 @@ int copyStringToMachine(char* s, int to, unsigned size)
 	}
 }
 
-int do_CreateThread(int f, int arg)
-{
-	
-}
 #endif // end CHAGNED

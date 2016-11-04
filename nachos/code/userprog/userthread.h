@@ -1,3 +1,7 @@
 #ifdef CHANGED
+
+
 extern int do_CreateThread(int f, int arg);
-#endif
+extern void do_ThreadExit();
+
+#endif // CHANGED
