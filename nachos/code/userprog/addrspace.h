@@ -17,7 +17,17 @@
 #include "filesys.h"
 #include "translate.h"
 
-#define UserStacksAreaSize		1024	// increase this as necessary!
+#define UserStacksAreaSize    1024  // increase this as necessary!
+
+
+#ifdef CHANGED
+#include "bitmap.h"
+#define ThreadSize      256     // Espace entre chaque thread
+#endif // CHANGED
+
+#ifdef CHANGED
+class Semaphore;
+#endif // CHANGED
 
 class AddrSpace:dontcopythis
 {
@@ -34,14 +44,25 @@ class AddrSpace:dontcopythis
     void RestoreState ();	// info on a context switch 
 
 #ifdef CHANGED
-    int AllocateUserStack();
+    int AllocateUserStack();  // Retourne un adresse valide pour un nouveau thread
+    void IncreaseThreadNb();     // Incremente le compteur de thread
+    void DecreaseThreadNb();   // Decremente le compteur de thread
+    int GetNbThread();        // Retourne le nombre de thread
 #endif // CHANGED
 
   private:
-      TranslationEntry * pageTable;	// Assume linear page table translation
+      TranslationEntry * pageTable; // Assume linear page table translation
     // for now!
-    unsigned int numPages;	// Number of pages in the virtual 
+    unsigned int numPages;  // Number of pages in the virtual 
     // address space
+
+
+#ifdef CHANGED
+    int nbThread;                 // nombre de thread cree dans l'esapce d'adressage
+    Semaphore* semaphoreNbThread; // Incrementer nbThread en exclusion mutuelle
+    BitMap* bitmap;
+#endif // CHANGED
+
 };
 
 #endif // ADDRSPACE_H

@@ -19,14 +19,19 @@ static void StartUserThread(void *schmurtz)
 	int f = ((int)((userThreadParams*)schmurtz)->f);
 	int arg = ((int)((userThreadParams*)schmurtz)->arg);
 
-	machine->WriteRegister(PCReg, f);
-	machine->WriteRegister(4, arg);
+	machine->WriteRegister(PCReg, f);		// Adresse sur le debut de la fonction
+	machine->WriteRegister(4, arg);			// Donne le parametre de la fonction
+	// Instruction suivante
 	machine->WriteRegister(NextPCReg, machine->ReadRegister(PCReg) + 4);
 
-	DEBUG ('x', "Initializing register to %d %d\n", arg, machine->ReadRegister(PCReg) + 4);
+	DEBUG ('x', "Initializing register to PCReg %d arg %d NextPCReg %d\n",
+		f, arg, machine->ReadRegister(PCReg) + 4);
 
+	// Mise a jour du pointeur de pile
 	machine->WriteRegister(StackReg, currentThread->space->AllocateUserStack());
     DEBUG ('x', "Initializing stack register to %d\n", currentThread->space->AllocateUserStack());
+
+    currentThread->space->IncreaseThreadNb();
 
 	// Lance le programme utilisateur
 	machine->Run(); 
@@ -47,7 +52,9 @@ int do_CreateThread(int f, int arg)
 	userThreadParams* params = new userThreadParams;
 	params->f = f;
 	params->arg = arg;
-	DEBUG('x', "Valeures des paremetres %d %d\n", params->f, params->arg);
+
+	DEBUG('x', "Nouveau thread cree\n");
+	//DEBUG('x', "Adresse fonction %d valeur parametre %d\n", f, arg);
 
 	// On place le thread dans la file d'attente
 	newThread->Start(StartUserThread, (void*)params);
@@ -58,6 +65,17 @@ int do_CreateThread(int f, int arg)
 // Detruit le thread actif
 void do_ThreadExit()
 {
+	DEBUG('x', "Terminaison du thread %s\n", currentThread->getName());
+	currentThread->space->DecreaseThreadNb();
+
+
+	// Si c est le dernier thread qui termine, alors on quitte NachOS
+	if (currentThread->space->GetNbThread() == 0)
+	{
+		DEBUG('x', "Appel: interrupt->Halt()\n");
+		interrupt->Halt();
+	}
+
 	currentThread->Finish();
 }
 #endif // CHANGED

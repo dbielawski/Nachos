@@ -22,6 +22,10 @@
 #include "syscall.h"
 #include "new"
 
+#ifdef CHANGED
+#include "synch.h"
+#endif // CHANGED
+
 //----------------------------------------------------------------------
 // SwapHeader
 //      Do little endian to big endian conversion on the bytes in the 
@@ -122,6 +126,15 @@ AddrSpace::AddrSpace (OpenFile * executable)
 	   size - UserStacksAreaSize, UserStacksAreaSize);
 
     pageTable[0].valid = FALSE;			// Catch NULL dereference
+
+#ifdef CHANGED
+    nbThread = 1;   // LE MAIN !!
+    semaphoreNbThread = new Semaphore("nombre de thread", 1);
+
+    bitmap = new BitMap(UserStacksAreaSize / ThreadSize);
+
+#endif // CHANGED
+
 }
 
 //----------------------------------------------------------------------
@@ -131,6 +144,11 @@ AddrSpace::AddrSpace (OpenFile * executable)
 
 AddrSpace::~AddrSpace ()
 {
+#ifdef CHANGED
+    delete semaphoreNbThread;
+    delete bitmap;
+#endif // CHANGED
+
   // LB: Missing [] for delete
   // delete pageTable;
   delete [] pageTable;
@@ -200,12 +218,56 @@ AddrSpace::RestoreState ()
 
 
 #ifdef CHANGED
-// Retourne l adresse du haute de la pile
-// 1er version simpliste qui marche pour un thread
+// Retourne une adresse  disponible dans la pile
 int AddrSpace::AllocateUserStack()
 {
     int size = numPages * PageSize;
 
-    return size - 256;
+    int i = bitmap->Find();
+
+
+    if (i < 0)
+    {
+        // Attente
+    }
+    
+    int addr = size - ThreadSize * i;
+
+    // Faut mettre en place systeme de file d'attente
+    // Test pour ne depasser dans Data ou Code
+    if (addr - ThreadSize < size - UserStacksAreaSize)
+    {
+        // Erreur, on a depasse la zone dedie au threads user
+        DEBUG('x', "Erreur d'allocation de la pile pour le thread %d\n", nbThread);
+    }
+
+    return addr;
 }
+
+// Ajoute un thread au compteur de thread
+// Est thread safe
+void AddrSpace::IncreaseThreadNb()
+{
+    semaphoreNbThread->P();
+    nbThread++;
+    DEBUG('x', "Nombre de thread(s) %d\n", nbThread);
+    semaphoreNbThread->V();
+}
+
+// Eneleve un thread au compteur de thread
+// Est thread safe
+void AddrSpace::DecreaseThreadNb()
+{
+    semaphoreNbThread->P();
+    nbThread--;
+    DEBUG('x', "Nombre de thread(s) %d\n", nbThread);
+    semaphoreNbThread->V();
+}
+
+// Renvoie le nombre de thread cree
+int AddrSpace::GetNbThread()
+{
+    return nbThread;
+}
+
 #endif // CHANGED

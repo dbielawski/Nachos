@@ -12,10 +12,27 @@ void affiche(char c)
 	ThreadExit();
 }
 
+void affiche_a(char c)
+{
+	volatile int i;
+	for (i = 0; i < 1; ++i)
+	{
+		PutChar(c);
+	}
+	ThreadExit();
+}
+
 int main()
 {
-	ThreadCreate(affiche, 65); // 65 <=> A ASCII
-	fait_rien(1000);
+	// ThreadCreate(affiche, 'A');
+	// PutChar('B');
+	// PutChar('C');
+	ThreadCreate(affiche_a, 'a');
+	ThreadCreate(affiche_a, 'b');
+	ThreadCreate(affiche_a, 'c');
+	ThreadCreate(affiche_a, 'd');
+	ThreadCreate(affiche_a, 'e');
 
-	Exit(0);
+	fait_rien(100);
+	ThreadExit();
 }

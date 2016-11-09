@@ -9,6 +9,9 @@ static Semaphore *readAvail;
 static Semaphore *writeDone;
 
 
+static Semaphore *semaphoreSynchPutChar;
+static Semaphore *semaphoreSynchGetChar;
+static Semaphore *semaphoreSynchPutString;
 static Semaphore *semaphoreSynchGetString;
 
 
@@ -22,7 +25,12 @@ SynchConsole::SynchConsole(const char *in, const char *out)
 	writeDone = new Semaphore("write done", 0);
 	console = new Console(in, out, ReadAvailHandler, WriteDoneHandler, NULL);
 
-	semaphoreSynchGetString = new Semaphore("get string done", 1);
+
+	semaphoreSynchPutChar = new Semaphore("put char", 1);
+	semaphoreSynchGetChar = new Semaphore("get char", 1);
+
+	semaphoreSynchPutString = new Semaphore("put string", 1);
+	semaphoreSynchGetString = new Semaphore("get string", 1);
 }
 
 SynchConsole::~SynchConsole()
@@ -30,24 +38,37 @@ SynchConsole::~SynchConsole()
 	delete console;
 	delete writeDone;
 	delete readAvail;
+
+	delete semaphoreSynchPutChar;
+	delete semaphoreSynchGetChar;
+	delete semaphoreSynchGetString;
+	delete semaphoreSynchPutString;
 }
 
 
 // Affiche un caractere sur la console
 void SynchConsole::SynchPutChar(int ch)
 {
+	semaphoreSynchPutChar->P();
+
 	console->PutChar(ch);
 	writeDone->P();
+
+	semaphoreSynchPutChar->V();
 }
 
 // Recupere un caractere et l'affiche
 int SynchConsole::SynchGetChar()
 {
+	semaphoreSynchGetChar->P();
+
 	readAvail->P();
 	char c = console->GetChar();
 
 	if (c == EOF)
 		c = ' ';
+
+	semaphoreSynchGetChar->V();
 
 	return c;
 }
@@ -55,8 +76,12 @@ int SynchConsole::SynchGetChar()
 // Affiche un chaine de caractere sur la console
 void SynchConsole::SynchPutString(const char s[])
 {
+	semaphoreSynchPutString->P();
+
 	for (int i = 0; i < MAX_STRING_SIZE && s[i]; ++i)
 		SynchPutChar(s[i]);
+
+	semaphoreSynchPutString->V();
 }
 
 // Recupere une chaine et l'affiche

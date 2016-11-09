@@ -185,7 +185,13 @@ ExceptionHandler (ExceptionType which)
 
 		  	int f = machine->ReadRegister(4);
 		  	int arg = machine->ReadRegister(5);
-		  	do_CreateThread(f, arg);
+
+		  	if (do_CreateThread(f, arg) < 0)
+		  	{
+		  		printf("Erreur lors de la creation du thread\n");
+		  		ASSERT(FALSE);
+		  	}
+		  	
 		  	break;
 		  }
 		  case SC_ThreadExit:
