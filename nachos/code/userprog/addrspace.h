@@ -44,10 +44,12 @@ class AddrSpace:dontcopythis
     void RestoreState ();	// info on a context switch 
 
 #ifdef CHANGED
-    int AllocateUserStack();  // Retourne un adresse valide pour un nouveau thread
-    void IncreaseThreadNb();     // Incremente le compteur de thread
-    void DecreaseThreadNb();   // Decremente le compteur de thread
-    int GetNbThread();        // Retourne le nombre de thread
+    int AllocateUserStack();    // Retourne un adresse valide pour un nouveau thread
+    int GetNbThread();          // Retourne le nombre de thread
+    void AddThread();           // Incremente le nb de thread
+    void RemoveThread();        // Decremente le nb de thread
+    int GetNewId();             // Va chercher dans la bitmap un emplacement libre
+    void RemoveId();            // Va supprimer le thread courant de la bitmap
 #endif // CHANGED
 
   private:
@@ -58,8 +60,11 @@ class AddrSpace:dontcopythis
 
 
 #ifdef CHANGED
-    int nbThread;                 // nombre de thread cree dans l'esapce d'adressage
-    Semaphore* semaphoreNbThread; // Incrementer nbThread en exclusion mutuelle
+    int nbThread;                       // nombre de thread cree dans l'esapce d'adressage
+    Semaphore* semaphoreNbThread;       // Modifer nbThread en exclusion mutuelle
+    Semaphore* semaphoreClearBM;
+    Semaphore* semaphoreGetId;
+    Semaphore* semaphoreAttendAutreThreads;
     BitMap* bitmap;
 #endif // CHANGED
 

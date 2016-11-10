@@ -24,14 +24,20 @@ static void StartUserThread(void *schmurtz)
 	// Instruction suivante
 	machine->WriteRegister(NextPCReg, machine->ReadRegister(PCReg) + 4);
 
-	DEBUG ('x', "Initializing register to PCReg %d arg %d NextPCReg %d\n",
-		f, arg, machine->ReadRegister(PCReg) + 4);
+	// DEBUG ('x', "Initializing register to PCReg %d arg %d NextPCReg %d\n",
+		// f, arg, machine->ReadRegister(PCReg) + 4);
+
+	int addr = currentThread->space->AllocateUserStack();
+
+	if (addr < 0)		// Une mauvaise adresse est renvoyée (depassement de la zone d'adressage)
+	{
+		printf("Erreur lors de l'allocation de la pile\n");
+		ASSERT(FALSE);
+	}
 
 	// Mise a jour du pointeur de pile
-	machine->WriteRegister(StackReg, currentThread->space->AllocateUserStack());
-    DEBUG ('x', "Initializing stack register to %d\n", currentThread->space->AllocateUserStack());
-
-    currentThread->space->IncreaseThreadNb();
+	machine->WriteRegister(StackReg, addr);
+    DEBUG ('x', "Initializing stack register to %d\n", addr);
 
 	// Lance le programme utilisateur
 	machine->Run(); 
@@ -56,6 +62,8 @@ int do_CreateThread(int f, int arg)
 	DEBUG('x', "Nouveau thread cree\n");
 	//DEBUG('x', "Adresse fonction %d valeur parametre %d\n", f, arg);
 
+	currentThread->space->AddThread();
+
 	// On place le thread dans la file d'attente
 	newThread->Start(StartUserThread, (void*)params);
 
@@ -65,8 +73,9 @@ int do_CreateThread(int f, int arg)
 // Detruit le thread actif
 void do_ThreadExit()
 {
-	DEBUG('x', "Terminaison du thread %s\n", currentThread->getName());
-	currentThread->space->DecreaseThreadNb();
+	DEBUG('x', "Terminaison du thread: %s id: %d\n", currentThread->getName(), currentThread->id);
+	currentThread->space->RemoveThread();
+	currentThread->space->RemoveId();
 
 
 	// Si c est le dernier thread qui termine, alors on quitte NachOS

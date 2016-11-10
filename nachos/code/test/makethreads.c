@@ -31,8 +31,8 @@ int main()
 	ThreadCreate(affiche_a, 'b');
 	ThreadCreate(affiche_a, 'c');
 	ThreadCreate(affiche_a, 'd');
-	ThreadCreate(affiche_a, 'e');
 
-	fait_rien(100);
+	fait_rien(1000);
+	// ThreadCreate(affiche_a, 'e');
 	ThreadExit();
 }
