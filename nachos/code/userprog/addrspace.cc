@@ -277,15 +277,16 @@ void AddrSpace::RemoveThread()
     semaphoreNbThread->P();
     nbThread--;
     DEBUG('x', "Nombre de thread(s) %d\n", nbThread);
+    semaphoreAttendAutresThreads->V();
     semaphoreNbThread->V();
 }
 
 // Va chercher dans la bitmap un emplacement libre
 int AddrSpace::GetNewId()
 {
-    semaphoreAttendAutresThreads->P();
     semaphoreGetId->P();
     int id = bitmap->Find();
+    semaphoreAttendAutresThreads->P();
     semaphoreGetId->V();
     return id;
 }
@@ -296,6 +297,5 @@ void AddrSpace::RemoveId()
     semaphoreClearBM->P();
     bitmap->Clear(currentThread->id);
     semaphoreClearBM->V();
-    semaphoreAttendAutresThreads->V();
 }
 #endif // CHANGED
