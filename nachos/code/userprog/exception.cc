@@ -189,7 +189,7 @@ ExceptionHandler (ExceptionType which)
 		  	if (do_CreateThread(f, arg) < 0)
 		  	{
 		  		printf("Erreur lors de la creation du thread\n");
-		  		ASSERT(FALSE);
+		  		//ASSERT(FALSE);
 		  	}
 		  	
 		  	break;

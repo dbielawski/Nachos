@@ -15,7 +15,7 @@ void affiche(char c)
 void affiche_a(char c)
 {
 	volatile int i;
-	for (i = 0; i < 1; ++i)
+	for (i = 0; i < 3; ++i)
 	{
 		PutChar(c);
 	}
@@ -31,8 +31,9 @@ int main()
 	ThreadCreate(affiche_a, 'b');
 	ThreadCreate(affiche_a, 'c');
 	ThreadCreate(affiche_a, 'd');
+	ThreadCreate(affiche_a, 'e');
 
-	fait_rien(1000);
+	fait_rien(10000);
 	// ThreadCreate(affiche_a, 'e');
 	ThreadExit();
 }

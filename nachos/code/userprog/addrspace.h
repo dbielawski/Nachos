@@ -64,7 +64,9 @@ class AddrSpace:dontcopythis
     Semaphore* semaphoreNbThread;       // Modifer nbThread en exclusion mutuelle
     Semaphore* semaphoreClearBM;
     Semaphore* semaphoreGetId;
-    Semaphore* semaphoreAttendAutreThreads;
+    Semaphore* semaphoreAttendAutresThreads;    // Des qu il n y a plus d emplacement
+    // dans la bitmap, on bloque, quand un thread termine, on deblque
+    
     BitMap* bitmap;
 #endif // CHANGED
 
