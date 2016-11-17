@@ -128,6 +128,9 @@ AddrSpace::AddrSpace (OpenFile * executable)
     pageTable[0].valid = FALSE;			// Catch NULL dereference
 
 #ifdef CHANGED
+
+    //ReadAtVirtual(executable, virutaladdr, numBytes, 0, pageTable, numPages);
+
     semaphoreNbThread = new Semaphore("nombre de thread", 1);
     semaphoreClearBM = new Semaphore("clear bitmap", 1);
     semaphoreGetId = new Semaphore("get id", 1);
@@ -297,5 +300,27 @@ void AddrSpace::RemoveId()
     semaphoreClearBM->P();
     bitmap->Clear(currentThread->id);
     semaphoreClearBM->V();
+}
+
+
+static void ReadAtVirtual(OpenFile* executable, int virtualaddr, int numBytes,
+    int position, TranslationEntry* pageTable, unsigned numPages)
+{
+
+    int buffer[numBytes];
+
+    executable->ReadAt(&buffer, numBytes, position);
+
+    TranslationEntry* const pageTableBackup = machine->pageTable;
+    const unsigned int pageTableSizeBackup  = machine->pageTableSize;
+
+    machine->pageTable = pageTable;
+    machine->pageTableSize = numPages;
+
+    for (int i = 0; i < numBytes; ++i)
+        machine->WriteMem(virtualaddr, 1, buffer[i]);
+
+    machine->pageTable      = pageTableBackup;
+    machine->pageTableSize  = pageTableSizeBackup;
 }
 #endif // CHANGED

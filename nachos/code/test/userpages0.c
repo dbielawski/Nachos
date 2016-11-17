@@ -9,5 +9,7 @@ int main()
 	PutChar('c');
 	PutChar('d');
 	PutChar('\n');
+
+	PutString("Hello world\n");
 	Exit(0);
 }

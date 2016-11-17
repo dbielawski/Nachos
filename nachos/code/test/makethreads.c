@@ -27,6 +27,8 @@ int main()
 	// ThreadCreate(affiche, 'A');
 	// PutChar('B');
 	// PutChar('C');
+	GetChar();
+	PutString("Hello world\n");
 	ThreadCreate(affiche_a, 'a');
 	ThreadCreate(affiche_a, 'b');
 	ThreadCreate(affiche_a, 'c');
