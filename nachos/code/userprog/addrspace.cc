@@ -311,7 +311,7 @@ void AddrSpace::RemoveId()
 
 
 // Ecrit dans l’espace d’adressage virtuel défini par la table des pages
-pageTable de taille numPages
+// pageTable de taille numPages
 static void ReadAtVirtual(OpenFile* executable, int virtualaddr, int numBytes,
     int position, TranslationEntry* pageTable, unsigned numPages)
 {
