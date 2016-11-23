@@ -1,5 +1,6 @@
 #ifdef CHANGED 
 #include "bitmap.h"
+#include "synch.h"
 
 
 class PageProvider
@@ -16,7 +17,7 @@ public:
 
 private:
 	BitMap* bitmap;
-	//Semaphore* semBitmap;
+	Semaphore* semBitmap;
 };
 
 #endif // CHANGED

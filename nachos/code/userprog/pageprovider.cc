@@ -6,38 +6,38 @@
 PageProvider::PageProvider(int n)
 {
 	bitmap = new BitMap(n);
-	//semBitmap = new Semaphore(1);
+	semBitmap = new Semaphore("semaphore bitmap", 1);
 }
 
 PageProvider::~PageProvider()
 {
 	delete bitmap;
-	//delete semBitmap;
+	delete semBitmap;
 }
 
 // Renvoie l'indice d'une page libre dans la bitmap, s'il n'y en a pas -1
 int PageProvider::GetEmptyPage()
 {
-	// semBitmap->P();
+	semBitmap->P();
 	int avail = bitmap->Find();
-	// semBitmap->V();
+	semBitmap->V();
 	return avail;
 }
 
 // Libere un page
 void PageProvider::ReleasePage(int p)
 {
-	// semBitmap->P();
+	semBitmap->P();
 	bitmap->Clear(p);
-	// semBitmap->V();
+	semBitmap->V();
 }
 
 // Renvoie le nombre de page libre
 int PageProvider::NumAvailPage()
 {
-	// semBitmap->P();
+	semBitmap->P();
 	int available = bitmap->NumClear();
-	// semBitmap->V();
+	semBitmap->V();
 	return available;
 }
 
