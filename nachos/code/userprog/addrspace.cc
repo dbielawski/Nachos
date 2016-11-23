@@ -33,6 +33,9 @@
 //      endian machine, and we're now running on a big endian machine.
 //----------------------------------------------------------------------
 
+static void ReadAtVirtual(OpenFile* executable, int virtualaddr, int numBytes,
+    int position, TranslationEntry* pageTable, unsigned numPages);
+
 static void
 SwapHeader (NoffHeader * noffH)
 {
@@ -95,7 +98,7 @@ AddrSpace::AddrSpace (OpenFile * executable)
     pageTable = new TranslationEntry[numPages];
     for (i = 0; i < numPages; i++)
       {
-	  pageTable[i].physicalPage = i;	// for now, phys page # = virtual page #
+	  pageTable[i].physicalPage = i + 1;	// for now, phys page # = virtual page #
 	  pageTable[i].valid = TRUE;
 	  pageTable[i].use = FALSE;
 	  pageTable[i].dirty = FALSE;
@@ -106,21 +109,27 @@ AddrSpace::AddrSpace (OpenFile * executable)
 
 // then, copy in the code and data segments into memory
     if (noffH.code.size > 0)
-      {
-	  DEBUG ('a', "Initializing code segment, at 0x%x, size 0x%x\n",
-		 noffH.code.virtualAddr, noffH.code.size);
-	  executable->ReadAt (&(machine->mainMemory[noffH.code.virtualAddr]),
-			      noffH.code.size, noffH.code.inFileAddr);
-      }
+    {
+        DEBUG ('a', "Initializing code segment, at 0x%x, size 0x%x\n",
+            noffH.code.virtualAddr, noffH.code.size);
+
+#ifdef CHANGED
+        ReadAtVirtual(executable, noffH.code.virtualAddr,
+            noffH.code.size, noffH.code.inFileAddr, pageTable, numPages);
+#endif // CHANGED
+
+    }
     if (noffH.initData.size > 0)
-      {
-	  DEBUG ('a', "Initializing data segment, at 0x%x, size 0x%x\n",
-		 noffH.initData.virtualAddr, noffH.initData.size);
-	  executable->ReadAt (&
-			      (machine->mainMemory
-			       [noffH.initData.virtualAddr]),
-			      noffH.initData.size, noffH.initData.inFileAddr);
-      }
+    {
+        DEBUG ('a', "Initializing data segment, at 0x%x, size 0x%x\n",
+            noffH.initData.virtualAddr, noffH.initData.size);
+
+#ifdef CHANGED
+        ReadAtVirtual(executable, noffH.initData.virtualAddr,
+            noffH.initData.size, noffH.initData.inFileAddr, pageTable, numPages);
+#endif // CHANGED
+
+    }
 
     DEBUG ('a', "Area for stacks at 0x%x, size 0x%x\n",
 	   size - UserStacksAreaSize, UserStacksAreaSize);
@@ -128,8 +137,6 @@ AddrSpace::AddrSpace (OpenFile * executable)
     pageTable[0].valid = FALSE;			// Catch NULL dereference
 
 #ifdef CHANGED
-
-    //ReadAtVirtual(executable, virutaladdr, numBytes, 0, pageTable, numPages);
 
     semaphoreNbThread = new Semaphore("nombre de thread", 1);
     semaphoreClearBM = new Semaphore("clear bitmap", 1);
@@ -303,22 +310,23 @@ void AddrSpace::RemoveId()
 }
 
 
+// Ecrit dans l’espace d’adressage virtuel défini par la table des pages
+pageTable de taille numPages
 static void ReadAtVirtual(OpenFile* executable, int virtualaddr, int numBytes,
     int position, TranslationEntry* pageTable, unsigned numPages)
 {
-
-    int buffer[numBytes];
-
-    executable->ReadAt(&buffer, numBytes, position);
-
     TranslationEntry* const pageTableBackup = machine->pageTable;
     const unsigned int pageTableSizeBackup  = machine->pageTableSize;
 
-    machine->pageTable = pageTable;
-    machine->pageTableSize = numPages;
+    machine->pageTable      = pageTable;
+    machine->pageTableSize  = numPages;
 
-    for (int i = 0; i < numBytes; ++i)
-        machine->WriteMem(virtualaddr, 1, buffer[i]);
+    char buffer[numBytes];
+
+    int n = executable->ReadAt(buffer, numBytes, position);
+
+    for (int i = 0; i < n; ++i)
+        machine->WriteMem(virtualaddr + i, 1, buffer[i]);
 
     machine->pageTable      = pageTableBackup;
     machine->pageTableSize  = pageTableSizeBackup;
