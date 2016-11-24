@@ -97,15 +97,21 @@ AddrSpace::AddrSpace (OpenFile * executable)
 // first, set up the translation 
     pageTable = new TranslationEntry[numPages];
     for (i = 0; i < numPages; i++)
-      {
-	  pageTable[i].physicalPage = i + 1;	// for now, phys page # = virtual page #
-	  pageTable[i].valid = TRUE;
-	  pageTable[i].use = FALSE;
-	  pageTable[i].dirty = FALSE;
-	  pageTable[i].readOnly = FALSE;	// if the code segment was entirely on 
-	  // a separate page, we could set its 
-	  // pages to be read-only
-      }
+    {
+        int emptyPage = pageProvider->GetEmptyPage();
+        if (emptyPage < 0)
+        {
+            printf("Plus de page libre\n");
+            ASSERT(FALSE);
+        }
+        pageTable[i].physicalPage = emptyPage;	// for now, phys page # = virtual page #
+        pageTable[i].valid = TRUE;
+        pageTable[i].use = FALSE;
+        pageTable[i].dirty = FALSE;
+        pageTable[i].readOnly = FALSE;	// if the code segment was entirely on 
+        // a separate page, we could set its 
+        // pages to be read-only
+    }
 
 // then, copy in the code and data segments into memory
     if (noffH.code.size > 0)
@@ -163,6 +169,8 @@ AddrSpace::AddrSpace (OpenFile * executable)
 AddrSpace::~AddrSpace ()
 {
 #ifdef CHANGED
+    ClearAllPages();    // Pour qu'un autre programme puisse utiliser les pages
+
     delete semaphoreNbThread;
     delete semaphoreClearBM;
     delete semaphoreGetId;
@@ -330,5 +338,14 @@ static void ReadAtVirtual(OpenFile* executable, int virtualaddr, int numBytes,
 
     machine->pageTable      = pageTableBackup;
     machine->pageTableSize  = pageTableSizeBackup;
+}
+
+// libere toutes les pages
+void AddrSpace::ClearAllPages()
+{
+    for (int i = 0; i < numPages; ++i)
+    {
+        pageProvider->ReleasePage(i);
+    }
 }
 #endif // CHANGED

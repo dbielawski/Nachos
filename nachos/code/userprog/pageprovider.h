@@ -16,13 +16,15 @@ public:
 	PageProvider(int nbPage);	// taille de la bitmap
 	~PageProvider();
 
-	int GetEmptyPage(); // Renvoie un page libre
+	int GetEmptyPage(); 		// Renvoie un page libre
 	void ReleasePage(int p);	// Libere un page
 	int NumAvailPage();			// Renvoie le nombre page libre
+	int Size();
 
 private:
 	BitMap* bitmap;
 	Semaphore* semBitmap;
+	int size;
 };
 
 #endif // PAGEPROVIDER_H

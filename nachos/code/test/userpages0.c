@@ -18,7 +18,9 @@ void fait_rien(int rien)
 int main()
 {
 	ThreadCreate(affiche_a, 'a');
-	PutString("Hello world\n");
+	// ThreadCreate(affiche_a, 'B');
+	// ThreadCreate(affiche_a, 'c');
+	// PutString("Hello world\n");
 	fait_rien(10000);
 	ThreadExit();
 }

@@ -68,6 +68,8 @@ class AddrSpace:dontcopythis
     // dans la bitmap, on bloque, quand un thread termine, on deblque
     
     BitMap* bitmap;
+
+    void ClearAllPages();
 #endif // CHANGED
 
 };
