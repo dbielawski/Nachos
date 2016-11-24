@@ -16,11 +16,16 @@ PageProvider::~PageProvider()
 }
 
 // Renvoie l'indice d'une page libre dans la bitmap, s'il n'y en a pas -1
+// et met la le contenu de la page a 0
 int PageProvider::GetEmptyPage()
 {
 	semBitmap->P();
 	int avail = bitmap->Find();
 	semBitmap->V();
+
+	if (avail != -1)
+		memset(&(machine->mainMemory[avail*PageSize]), 0, PageSize);
+
 	return avail;
 }
 
@@ -40,5 +45,6 @@ int PageProvider::NumAvailPage()
 	semBitmap->V();
 	return available;
 }
+
 
 #endif // CHANGED
