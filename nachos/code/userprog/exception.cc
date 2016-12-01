@@ -201,6 +201,25 @@ ExceptionHandler (ExceptionType which)
 		  	do_ThreadExit();
 		  	break;
 		  }
+		  case SC_ForkExec:
+		  {
+		  	DEBUG ('s', "SC_ForkExec, initiated by user program.\n");
+
+		    if (MAX_STRING_SIZE < 2)
+		    {
+		    	printf("ForkExec, le taille du tampon doit etre superieure a 1 !\n");
+		    	ASSERT(FALSE);
+		    }
+
+		    int c = machine->ReadRegister (4);
+
+		    char filename[100];
+		    copyStringFromMachine(c, filename, 100);
+
+		  	ForkExec(filename);
+
+		  	break;
+		  }
 #endif // end CHANGED
 
 		default:

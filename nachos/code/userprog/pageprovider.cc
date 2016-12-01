@@ -53,7 +53,7 @@ int PageProvider::GetEmptyPage()
 	return avail;
 }
 
-// Libere un page
+// Libere une page
 void PageProvider::ReleasePage(int p)
 {
 	semBitmap->P();
@@ -61,7 +61,7 @@ void PageProvider::ReleasePage(int p)
 	semBitmap->V();
 }
 
-// Renvoie le nombre de page libre
+// Renvoie le nombre de pages libres
 int PageProvider::NumAvailPage()
 {
 	semBitmap->P();

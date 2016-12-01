@@ -9,5 +9,5 @@ int main()
 	PutString(string);
 	PutString("\n");
 
-	Exit(0);
+	// Exit(0);
 }

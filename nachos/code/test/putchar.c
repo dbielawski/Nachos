@@ -16,5 +16,5 @@ int main()
 	print('a', 4);
 	PutChar('\n');
 
-	Exit(0);
+	// Exit(0);
 }

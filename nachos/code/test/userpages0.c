@@ -17,10 +17,16 @@ void fait_rien(int rien)
 
 int main()
 {
-	ThreadCreate(affiche_a, 'a');
+	// ThreadCreate(affiche_a, 'a');
 	// ThreadCreate(affiche_a, 'B');
 	// ThreadCreate(affiche_a, 'c');
 	// PutString("Hello world\n");
-	fait_rien(10000);
-	ThreadExit();
+	// fait_rien(10000);
+
+
+	ForkExec("test/putchar");
+	affiche_a('a');
+	ForkExec("test/putstring");
+
+	while(1);
 }

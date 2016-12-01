@@ -87,4 +87,32 @@ void do_ThreadExit()
 
 	currentThread->Finish();
 }
+
+int ForkExec(const char* filename)
+{
+ 	DEBUG ('x', "Starting ForkExec\n");
+    OpenFile *executable = fileSystem->Open (filename);
+    AddrSpace *space;
+
+    if (executable == NULL)
+    {
+    	printf ("Unable to open file %s\n", filename);
+    	return -1;
+    }
+    space = new AddrSpace (executable);
+    currentThread->space = space;
+
+    delete executable;		// close file
+
+    space->InitRegisters ();	// set the initial register values
+    space->RestoreState ();	// load page table register
+
+    Thread* newThread = new Thread(filename);
+    space->AddThread();
+    currentThread = newThread;
+
+    machine->Run ();		// jump to the user progam
+    return 0;
+}
+
 #endif // CHANGED
