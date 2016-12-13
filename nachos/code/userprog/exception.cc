@@ -97,9 +97,10 @@ ExceptionHandler (ExceptionType which)
 		  {
 		  	DEBUG ('s', "Exit, initiated by user program.\n");
 		  	// On recupere l'aguement dans le registre 4
-		  	int code = machine->ReadRegister(4);
-	  		printf("Le programme s'est terminé avec le code de retour: %i\n", code);
-		  	interrupt->Halt();
+		  	// int code = machine->ReadRegister(4);
+	  		// printf("Le programme s'est terminé avec le code de retour: %i\n", code);
+		  	// interrupt->Halt();
+		  	do_Exit();
 		  	break;
 		  }
 
@@ -213,6 +214,7 @@ ExceptionHandler (ExceptionType which)
 
 		    int c = machine->ReadRegister (4);
 
+		    // Tres moche...
 		    char filename[100];
 		    copyStringFromMachine(c, filename, 100);
 

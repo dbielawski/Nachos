@@ -50,6 +50,8 @@ class AddrSpace:dontcopythis
     void RemoveThread();        // Decremente le nb de thread
     int GetNewId();             // Va chercher dans la bitmap un emplacement libre
     void RemoveId();            // Va supprimer le thread courant de la bitmap
+
+    void ClearAllPages();       // Libere toutes les pages
 #endif // CHANGED
 
   private:
@@ -67,9 +69,7 @@ class AddrSpace:dontcopythis
     Semaphore* semaphoreAttendAutresThreads;    // Des qu il n y a plus d emplacement
     // dans la bitmap, on bloque, quand un thread termine, on deblque
     
-    BitMap* bitmap;
-
-    void ClearAllPages();
+    BitMap* bitmap;    
 #endif // CHANGED
 
 };

@@ -73,9 +73,9 @@ int do_CreateThread(int f, int arg)
 // Detruit le thread actif
 void do_ThreadExit()
 {
-	DEBUG('x', "Terminaison du thread: %s id: %d\n", currentThread->getName(), currentThread->id);
-	currentThread->space->RemoveThread();
+	DEBUG('x', "Terminaison du thread: %s Thread id: %d\n", currentThread->getName(), currentThread->id);
 	currentThread->space->RemoveId();
+	currentThread->space->RemoveThread();
 
 
 	// Si c est le dernier thread qui termine, alors on quitte NachOS
@@ -88,6 +88,16 @@ void do_ThreadExit()
 	currentThread->Finish();
 }
 
+// Initialise les registres
+static void StartUserFork(void* param)
+{
+	currentThread->space->InitRegisters ();		// set the initial register values
+    currentThread->space->RestoreState ();		// load page table register
+	
+	machine->Run ();		// jump to the user progam
+}
+
+// Cree un thread et alloue son espace d'adressage
 int ForkExec(const char* filename)
 {
  	DEBUG ('x', "Starting ForkExec\n");
@@ -100,19 +110,35 @@ int ForkExec(const char* filename)
     	return -1;
     }
     space = new AddrSpace (executable);
-    currentThread->space = space;
 
-    delete executable;		// close file
-
-    space->InitRegisters ();	// set the initial register values
-    space->RestoreState ();	// load page table register
+    delete executable;		// close file    
 
     Thread* newThread = new Thread(filename);
-    space->AddThread();
-    currentThread = newThread;
+   	machine->addProcess();
+    newThread->space = space;
 
-    machine->Run ();		// jump to the user progam
+	newThread->id = space->GetNewId();
+
+    DEBUG('x', "Nouveau thread cree (fork) %s ID: %i\n", filename, newThread->id);
+
+    newThread->Start(StartUserFork, (void*)0);
+    
     return 0;
+}
+
+// S'il reste des processus on les laisse terminer avant de quitter
+void do_Exit()
+{
+	DEBUG ('x', "Exit %s id: %d\n", currentThread->getName(), currentThread->id);
+	currentThread->space->RemoveId();
+	machine->removeProcess();
+
+	if (machine->getProcessNumber() == 0)
+	{
+		currentThread->space->ClearAllPages();
+		interrupt->Halt();
+	}
+	currentThread->Finish();
 }
 
 #endif // CHANGED

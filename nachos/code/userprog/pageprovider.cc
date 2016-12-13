@@ -4,6 +4,7 @@
 #include "system.h"
 #include "stdlib.h"
 
+
 PageProvider::PageProvider(int n)
 {
 	bitmap = new BitMap(n);
@@ -17,8 +18,8 @@ PageProvider::~PageProvider()
 	delete semBitmap;
 }
 
-// Renvoie l'indice d'une page libre dans la bitmap, s'il n'y en a pas -1
-// et met la le contenu de la page a 0
+// Renvoie l'indice d'une page libre (de maniere aleatoire) dans la bitmap, s'il
+// n'y en a pas -1 et met la le contenu de la page a 0
 int PageProvider::GetEmptyPage()
 {
 	semBitmap->P();

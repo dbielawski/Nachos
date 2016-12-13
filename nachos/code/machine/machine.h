@@ -26,6 +26,7 @@
 #include "translate.h"
 #include "disk.h"
 
+
 // Definitions related to the size, and format of user memory
 
 #define PageSize 	SectorSize 	// set the page size equal to
@@ -107,6 +108,9 @@ class Instruction {
 // The procedures in this class are defined in machine.cc, mipssim.cc, and
 // translate.cc.
 
+#ifdef CHANGED
+class Semaphore;
+#endif // CHANGED
 class Machine:dontcopythis {
   public:
     Machine(bool debug);	// Initialize the simulation of the hardware
@@ -185,11 +189,23 @@ class Machine:dontcopythis {
     TranslationEntry *pageTable;
     unsigned int pageTableSize;
 
+
+#ifdef CHANGED
+    void addProcess();          // Incremente le nb de processus    
+    void removeProcess();       // Decremente le nb de processus
+    int getProcessNumber();     // Retourne le nb de processus
+#endif // CHANGED
+
   private:
     bool singleStep;		// drop back into the debugger after each
 				// simulated instruction
     int runUntilTime;		// drop back into the debugger when simulated
 				// time reaches this value
+
+#ifdef CHANGED
+    int processNumber;                  // Le nombre de processus courant
+    Semaphore* semaphoreProcessNumber;  // Inc/Dec en excplusion mutuelle
+#endif // CHANGED
 };
 
 extern void ExceptionHandler(ExceptionType which);

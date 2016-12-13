@@ -1,9 +1,9 @@
 #include "syscall.h"
 
-void affiche_a(char c)
+void affiche(char c)
 {
 	int i;
-	for (i = 0; i < 10; ++i)
+	for (i = 0; i < 3; ++i)
 		PutChar(c);
 	PutChar('\n');
 	ThreadExit();
@@ -17,16 +17,15 @@ void fait_rien(int rien)
 
 int main()
 {
-	// ThreadCreate(affiche_a, 'a');
-	// ThreadCreate(affiche_a, 'B');
-	// ThreadCreate(affiche_a, 'c');
+	// ThreadCreate(affiche, 'a');
+	// ThreadCreate(affiche, 'B');
+	// ThreadCreate(affiche, 'c');
 	// PutString("Hello world\n");
-	// fait_rien(10000);
 
 
-	ForkExec("test/putchar");
-	affiche_a('a');
-	ForkExec("test/putstring");
+	// ForkExec("test/putchar");
+	// ForkExec("test/putint");
 
-	while(1);
+	ForkExec("test/userpages1");
+	ForkExec("test/userpages2");
 }

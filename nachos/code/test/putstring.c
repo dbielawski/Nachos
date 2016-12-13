@@ -3,11 +3,10 @@
 int main()
 {
 	
-	// const char* string = "Hello World!!!\n";
-	const char* string = "abababa";
+	const char* string = "Hello World!!!\n";
 
 	PutString(string);
 	PutString("\n");
-
-	// Exit(0);
+	while(1);
+		// Exit(0);
 }

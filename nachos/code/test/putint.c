@@ -3,6 +3,7 @@
 int main()
 {
 
-	PutInt(650000);
-	Exit(0);
+	PutInt(200);
+	PutChar('\n');
+	while(1);
 }
